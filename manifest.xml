@@ -12,9 +12,9 @@
   <DefaultLocale>en-GB</DefaultLocale>
   <DisplayName DefaultValue="Email Filer (test)"/>
   <Description DefaultValue="Prototype: asks you to file an email before it is sent."/>
-  <IconUrl DefaultValue="https://YOURNAME.github.io/email-filer-test/assets/icon-64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://YOURNAME.github.io/email-filer-test/assets/icon-128.png"/>
-  <SupportUrl DefaultValue="https://YOURNAME.github.io/email-filer-test/taskpane.html"/>
+  <IconUrl DefaultValue="https://fabiocanna85.github.io/email-filer-test/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://fabiocanna85.github.io/email-filer-test/assets/icon-128.png"/>
+  <SourceLocation DefaultValue="https://fabiocanna85.github.io/email-filer-test/taskpane.html"/>
 
   <Hosts>
     <Host Name="Mailbox"/>
@@ -29,7 +29,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://YOURNAME.github.io/email-filer-test/taskpane.html"/>
+        <SourceLocation DefaultValue="https://fabiocanna85.github.io/email-filer-test/taskpane.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -127,15 +127,15 @@
 
       <Resources>
         <bt:Images>
-          <bt:Image id="Icon.16x16" DefaultValue="https://YOURNAME.github.io/email-filer-test/assets/icon-16.png"/>
-          <bt:Image id="Icon.32x32" DefaultValue="https://YOURNAME.github.io/email-filer-test/assets/icon-32.png"/>
-          <bt:Image id="Icon.80x80" DefaultValue="https://YOURNAME.github.io/email-filer-test/assets/icon-80.png"/>
+          <bt:Image id="Icon.16x16" DefaultValue="https://fabiocanna85.github.io/email-filer-test/assets/icon-16.png"/>
+          <bt:Image id="Icon.32x32" DefaultValue="https://fabiocanna85.github.io/email-filer-test/assets/icon-32.png"/>
+          <bt:Image id="Icon.80x80" DefaultValue="https://fabiocanna85.github.io/email-filer-test/assets/icon-80.png"/>
         </bt:Images>
         <bt:Urls>
-          <bt:Url id="Commands.Url"       DefaultValue="https://YOURNAME.github.io/email-filer-test/commands.html"/>
-          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://YOURNAME.github.io/email-filer-test/commands.html"/>
-          <bt:Url id="JSRuntime.Url"      DefaultValue="https://YOURNAME.github.io/email-filer-test/launchevent.js"/>
-          <bt:Url id="Taskpane.Url"       DefaultValue="https://YOURNAME.github.io/email-filer-test/taskpane.html"/>
+          <bt:Url id="Commands.Url"       DefaultValue="https://fabiocanna85.github.io/email-filer-test/commands.html"/>
+          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://fabiocanna85.github.io/email-filer-test/commands.html"/>
+          <bt:Url id="JSRuntime.Url"      DefaultValue="https://fabiocanna85.github.io/email-filer-test/launchevent.js"/>
+          <bt:Url id="Taskpane.Url"       DefaultValue="https://fabiocanna85.github.io/email-filer-test/taskpane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel"           DefaultValue="Email Filer"/>
