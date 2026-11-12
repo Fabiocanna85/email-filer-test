@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Email Filer (test)</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    :root {
+      --ink: #1b2733;
+      --muted: #5b6b7a;
+      --line: #c9d3dc;
+      --paper: #ffffff;
+      --wash: #f3f6f9;
+      --blue: #1f4e79;
+      --blue-dark: #163a5a;
+      --ok: #1e6b3a;
+      --warn-bg: #fff4d6;
+      --warn-line: #d9a400;
+      --err: #a12622;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 14px 14px 28px;
+      font: 14px/1.4 "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--ink); background: var(--paper);
+    }
+    h1 { font-size: 16px; margin: 0 0 2px; font-weight: 600; }
+    p.lead { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+    section { margin: 0 0 16px; }
+    h2 { font-size: 13px; font-weight: 600; margin: 0 0 6px; color: var(--blue); }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 2px; }
+    input[type=text] {
+      width: 100%; padding: 6px 8px; font: inherit; color: var(--ink);
+      border: 1px solid var(--line); border-radius: 3px; background: var(--paper);
+    }
+    input[type=text]:focus, select:focus, button:focus-visible {
+      outline: 2px solid var(--blue); outline-offset: 1px;
+    }
+    .row { display: flex; gap: 8px; }
+    .row > * { flex: 1; min-width: 0; }
+    .row.fixed > button { flex: 0 0 auto; }
+    .preview {
+      margin-top: 8px; padding: 7px 8px; background: var(--wash);
+      border-left: 3px solid var(--blue); word-break: break-word; font-size: 13px;
+    }
+    select {
+      width: 100%; font: inherit; color: var(--ink);
+      border: 1px solid var(--line); border-radius: 3px; padding: 2px; background: var(--paper);
+    }
+    button {
+      font: inherit; padding: 6px 12px; border-radius: 3px; cursor: pointer;
+      border: 1px solid var(--blue); background: var(--paper); color: var(--blue);
+    }
+    button:hover { background: var(--wash); }
+    button.primary { background: var(--blue); color: #fff; width: 100%; padding: 9px 12px; font-weight: 600; }
+    button.primary:hover { background: var(--blue-dark); }
+    .selected {
+      margin-top: 8px; padding: 7px 8px; background: var(--wash); border-left: 3px solid var(--blue);
+      word-break: break-word; min-height: 34px;
+    }
+    .selected.empty { color: var(--muted); border-left-color: var(--line); }
+    .note {
+      padding: 8px 10px; background: var(--warn-bg); border-left: 3px solid var(--warn-line);
+      font-size: 13px; margin-bottom: 14px;
+    }
+    #status { margin-top: 10px; font-size: 13px; min-height: 18px; }
+    #status.ok { color: var(--ok); font-weight: 600; }
+    #status.err { color: var(--err); font-weight: 600; }
+    dl { margin: 0; }
+    dt { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    dd { margin: 0; word-break: break-word; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <h1>Email Filer (test)</h1>
+  <p class="lead" id="lead">Loading…</p>
+
+  <div id="notOutlook" class="note hidden">
+    This page is meant to be opened inside Outlook. If you can see this message in a normal browser, the files are online and working.
+  </div>
+
+  <!-- ===== Compose: choose name and location ===== -->
+  <div id="composePanel" class="hidden">
+
+    <section>
+      <h2>File name</h2>
+      <div class="row">
+        <div><label for="fromInit">From</label><input type="text" id="fromInit" maxlength="6" autocomplete="off"/></div>
+        <div><label for="toInit">To</label><input type="text" id="toInit" maxlength="6" autocomplete="off"/></div>
+      </div>
+      <label for="textPart">Description</label>
+      <input type="text" id="textPart" autocomplete="off" placeholder="e.g. Noise report review"/>
+      <div class="preview" id="preview"></div>
+      <p style="margin:6px 0 0"><button type="button" id="refreshInit">Refresh initials from email</button></p>
+    </section>
+
+    <section>
+      <h2>Location</h2>
+      <label for="searchBox">Search recent locations</label>
+      <div class="row fixed">
+        <input type="text" id="searchBox" autocomplete="off"/>
+        <button type="button" id="searchBtn">Search</button>
+      </div>
+      <label for="folderList">Recent locations (up to 50)</label>
+      <select id="folderList" size="7"></select>
+      <p style="margin:6px 0 0"><button type="button" id="removeBtn">Remove selected</button></p>
+
+      <label for="newFolder">Add a new location</label>
+      <div class="row fixed">
+        <input type="text" id="newFolder" autocomplete="off" placeholder="e.g. Projects/Test/Correspondence"/>
+        <button type="button" id="addBtn">Add</button>
+      </div>
+
+      <div class="selected empty" id="selectedBox">No location selected</div>
+    </section>
+
+    <button type="button" class="primary" id="confirmBtn">Confirm filing</button>
+    <div id="status" role="status" aria-live="polite"></div>
+    <p class="lead" style="margin-top:12px">After confirming, press Send again. This test does not save anything to SharePoint.</p>
+  </div>
+
+  <!-- ===== Read: show what is stored on a sent email ===== -->
+  <div id="readPanel" class="hidden">
+    <section>
+      <h2>Filing choice stored on this email</h2>
+      <dl id="storedList"></dl>
+    </section>
+  </div>
+
+<script src="taskpane.js"></script>
+</body>
+</html>
