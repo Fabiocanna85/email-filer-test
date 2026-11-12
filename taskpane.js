@@ -5,6 +5,7 @@
  *          survives sending).
  */
 
+var VERSION = "v0.2";
 var DATE_FORMAT_YYMMDD = true;       // YYMMDD, as agreed. Set false for DDMMYY.
 var MAX_RECENT = 50;
 var SETTINGS_KEY = "recentFolders";
@@ -14,6 +15,17 @@ var selectedFolder = "";
 var customProps = null;
 
 function $(id) { return document.getElementById(id); }
+
+// Show any unexpected error on screen instead of failing silently.
+function showBanner(msg) {
+  var b = $("banner");
+  if (!b) return;
+  b.textContent = msg;
+  b.classList.remove("hidden");
+}
+window.addEventListener("error", function (e) {
+  showBanner("Something went wrong: " + (e && e.message ? e.message : "unknown error"));
+});
 
 Office.onReady(function (info) {
   if (!info || !info.host) {
@@ -36,13 +48,8 @@ Office.onReady(function (info) {
 /* ---------------------------------------------------------------- compose */
 
 function startCompose() {
-  $("lead").textContent = "Choose a file name and location, then confirm. You can then send.";
+  $("lead").textContent = "Choose a file name and location, then confirm. You can then send. (" + VERSION + ")";
   $("composePanel").classList.remove("hidden");
-
-  allFolders = loadFolders();
-  renderFolders(allFolders);
-  prefillInitials();
-  updatePreview();
 
   $("fromInit").addEventListener("input", updatePreview);
   $("toInit").addEventListener("input", updatePreview);
@@ -58,6 +65,11 @@ function startCompose() {
   $("addBtn").addEventListener("click", addFolder);
   $("removeBtn").addEventListener("click", removeSelectedFolder);
   $("confirmBtn").addEventListener("click", confirmFiling);
+
+  try { allFolders = loadFolders(); } catch (e) { allFolders = []; }
+  renderFolders(allFolders);
+  updatePreview();
+  try { prefillInitials(); } catch (e) { /* initials can be typed by hand */ }
 
   Office.context.mailbox.item.loadCustomPropertiesAsync(function (r) {
     if (r.status === Office.AsyncResultStatus.Succeeded) {
@@ -128,8 +140,12 @@ function normalise(p) {
 }
 
 function loadFolders() {
+  var raw = null;
+  try { raw = Office.context.roamingSettings.get(SETTINGS_KEY); } catch (e) { raw = null; }
+  if (!raw) {
+    try { raw = window.localStorage.getItem(SETTINGS_KEY); } catch (e) { raw = null; }
+  }
   try {
-    var raw = Office.context.roamingSettings.get(SETTINGS_KEY);
     var list = raw ? JSON.parse(raw) : [];
     return Array.isArray(list) ? list : [];
   } catch (e) {
@@ -137,11 +153,26 @@ function loadFolders() {
   }
 }
 
+// Saving must never stop the on-screen list from updating.
 function saveFolders(list, done) {
-  Office.context.roamingSettings.set(SETTINGS_KEY, JSON.stringify(list));
-  Office.context.roamingSettings.saveAsync(function (r) {
-    if (done) done(r.status === Office.AsyncResultStatus.Succeeded);
-  });
+  var json = JSON.stringify(list);
+  var saved = false;
+
+  try {
+    Office.context.roamingSettings.set(SETTINGS_KEY, json);
+    Office.context.roamingSettings.saveAsync(function () {});
+    saved = true;
+  } catch (e) { /* fall through to the next store */ }
+
+  try {
+    window.localStorage.setItem(SETTINGS_KEY, json);
+    saved = true;
+  } catch (e) { /* no local storage either */ }
+
+  if (!saved) {
+    showBanner("The location list could not be stored, so it will only last until you close this panel.");
+  }
+  if (done) done(saved);
 }
 
 function dedupe(list) {
@@ -183,14 +214,14 @@ function runSearch() {
 
 function addFolder() {
   var p = normalise($("newFolder").value);
-  if (!p) { setStatus("Type a location to add.", "err"); return; }
+  if (!p) { setStatus("Type a location in the box first, then press Add.", "err"); return; }
   allFolders = dedupe([p].concat(allFolders));   // newest first, no duplicates
-  saveFolders(allFolders);
   $("newFolder").value = "";
   $("searchBox").value = "";
   setSelected(p);
   renderFolders(allFolders);
-  setStatus("", "");
+  saveFolders(allFolders);
+  setStatus("Added: " + p, "ok");
 }
 
 function removeSelectedFolder() {
@@ -251,7 +282,7 @@ function setStatus(msg, kind) {
 /* ------------------------------------------------------------------- read */
 
 function startRead() {
-  $("lead").textContent = "This shows whether the filing choice stayed with the email after sending.";
+  $("lead").textContent = "This shows whether the filing choice stayed with the email after sending. (" + VERSION + ")";
   $("readPanel").classList.remove("hidden");
 
   Office.context.mailbox.item.loadCustomPropertiesAsync(function (r) {

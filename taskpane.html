@@ -64,7 +64,7 @@
       padding: 8px 10px; background: var(--warn-bg); border-left: 3px solid var(--warn-line);
       font-size: 13px; margin-bottom: 14px;
     }
-    #status { margin-top: 10px; font-size: 13px; min-height: 18px; }
+    #status { margin: 0 0 10px; font-size: 13px; min-height: 18px; }
     #status.ok { color: var(--ok); font-weight: 600; }
     #status.err { color: var(--err); font-weight: 600; }
     dl { margin: 0; }
@@ -77,6 +77,8 @@
 
   <h1>Email Filer (test)</h1>
   <p class="lead" id="lead">Loading…</p>
+  <div id="banner" class="note hidden" role="alert"></div>
+  <div id="status" role="status" aria-live="polite"></div>
 
   <div id="notOutlook" class="note hidden">
     This page is meant to be opened inside Outlook. If you can see this message in a normal browser, the files are online and working.
@@ -118,7 +120,6 @@
     </section>
 
     <button type="button" class="primary" id="confirmBtn">Confirm filing</button>
-    <div id="status" role="status" aria-live="polite"></div>
     <p class="lead" style="margin-top:12px">After confirming, press Send again. This test does not save anything to SharePoint.</p>
   </div>
 
@@ -130,6 +131,6 @@
     </section>
   </div>
 
-<script src="taskpane.js"></script>
+<script src="taskpane.js?v=2"></script>
 </body>
 </html>

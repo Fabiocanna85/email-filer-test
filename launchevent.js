@@ -24,8 +24,8 @@ function onMessageSendHandler(event) {
     } else {
       event.completed({
         allowEvent: false,
-        errorMessage: "This email has not been filed. Select Take action to choose a file name and location, or Send Anyway to send without filing.",
-        cancelLabel: "Don't send",
+        errorMessage: "This email has not been filed. Select File this email to choose a file name and location, or Send Anyway to send without filing.",
+        cancelLabel: "File this email",
         commandId: "msgComposeOpenPaneButton"
       });
     }
